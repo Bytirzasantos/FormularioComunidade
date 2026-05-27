@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Raio-X Boom 💙</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --navy: #0D1F35;
+      --navy-mid: #1A3050;
+      --blue: #4A7FA8;
+      --blue-light: #6B9FCA;
+      --cream: #FBF9F2;
+      --cream-dim: rgba(251,249,242,0.7);
+      --cream-faint: rgba(251,249,242,0.08);
+      --border: rgba(251,249,242,0.1);
+      --accent: #7BB8D4;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: var(--cream);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px 16px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -200px; right: -200px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(74,127,168,0.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -150px; left: -150px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(26,48,80,0.6) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 580px;
+      background: rgba(251,249,242,0.04);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 32px;
+      padding: 44px 40px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 3px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 999px;
+      margin-bottom: 40px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 8%;
+      background: linear-gradient(90deg, var(--blue), var(--accent));
+      border-radius: 999px;
+      transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .step { display: none; }
+    .step.active {
+      display: block;
+      animation: stepIn 0.45s cubic-bezier(0.4,0,0.2,1) both;
+    }
+    @keyframes stepIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(107,159,202,0.1);
+      border: 1px solid rgba(107,159,202,0.25);
+      border-radius: 999px;
+      padding: 6px 14px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 42px;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      line-height: 1.3;
+      margin-bottom: 24px;
+      font-weight: 400;
+    }
+    h2 em { font-style: italic; color: var(--accent); }
+
+    p {
+      color: var(--cream-dim);
+      line-height: 1.75;
+      font-size: 15px;
+      margin-bottom: 14px;
+    }
+    .highlight { color: var(--accent); font-weight: 500; }
+
+    input[type="text"], textarea {
+      width: 100%;
+      background: var(--cream-faint);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 20px;
+      color: var(--cream);
+      font-size: 15px;
+      font-family: 'DM Sans', sans-serif;
+      margin-bottom: 20px;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    input[type="text"]::placeholder, textarea::placeholder { color: rgba(251,249,242,0.3); }
+    input[type="text"]:focus, textarea:focus {
+      border-color: var(--blue-light);
+      background: rgba(251,249,242,0.07);
+    }
+    textarea { min-height: 110px; resize: vertical; }
+
+    .options { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--cream-faint);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 18px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 15px;
+      color: var(--cream-dim);
+      user-select: none;
+    }
+    .option:hover {
+      border-color: rgba(107,159,202,0.5);
+      background: rgba(107,159,202,0.08);
+      color: var(--cream);
+      transform: translateX(3px);
+    }
+    .option input[type="checkbox"] {
+      width: 18px; height: 18px;
+      accent-color: var(--accent);
+      flex-shrink: 0;
+      margin: 0; padding: 0;
+    }
+
+    .btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--blue) 0%, var(--navy-mid) 100%);
+      border: 1px solid rgba(107,159,202,0.3);
+      color: var(--cream);
+      padding: 18px 24px;
+      border-radius: 16px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      margin-top: 12px;
+      letter-spacing: 0.02em;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(74,127,168,0.3);
+      border-color: rgba(107,159,202,0.5);
+    }
+    .btn:active { transform: translateY(0); }
+
+    .helper {
+      font-size: 13px;
+      color: rgba(251,249,242,0.4);
+      margin-bottom: 14px;
+      margin-top: -8px;
+    }
+
+    .step-counter {
+      font-size: 12px;
+      color: rgba(251,249,242,0.3);
+      margin-bottom: 8px;
+      letter-spacing: 0.05em;
+    }
+
+    /* Dashboard */
+    #dashboard {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 100;
+      overflow-y: auto;
+      padding: 24px 16px;
+    }
+    .dash-card {
+      max-width: 720px;
+      margin: 0 auto;
+      background: #0D1F35;
+      border: 1px solid rgba(107,159,202,0.2);
+      border-radius: 28px;
+      padding: 36px;
+    }
+    .dash-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      margin-bottom: 8px;
+      color: var(--cream);
+    }
+    .dash-sub {
+      font-size: 13px;
+      color: rgba(251,249,242,0.4);
+      margin-bottom: 28px;
+    }
+    .dash-entry {
+      background: rgba(251,249,242,0.04);
+      border: 1px solid rgba(251,249,242,0.08);
+      border-radius: 18px;
+      padding: 20px 22px;
+      margin-bottom: 14px;
+    }
+    .dash-entry-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .dash-name {
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--cream);
+    }
+    .dash-prof {
+      font-size: 13px;
+      color: var(--accent);
+      background: rgba(107,159,202,0.1);
+      border-radius: 999px;
+      padding: 3px 10px;
+    }
+    .dash-row {
+      font-size: 13px;
+      color: var(--cream-dim);
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+    .dash-row span { color: var(--cream); font-weight: 500; }
+    .dash-empty {
+      text-align: center;
+      color: rgba(251,249,242,0.3);
+      font-size: 15px;
+      padding: 40px 0;
+    }
+    .dash-delete-all {
+      background: rgba(255,80,80,0.08);
+      border: 1px solid rgba(255,80,80,0.25);
+      color: rgba(255,130,130,0.9);
+      padding: 14px 24px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      margin-top: 10px;
+      margin-right: 10px;
+      transition: all 0.2s;
+    }
+    .dash-delete-all:hover { background: rgba(255,80,80,0.15); border-color: rgba(255,80,80,0.5); }
+    .dash-delete-one {
+      background: transparent;
+      border: 1px solid rgba(255,80,80,0.2);
+      color: rgba(255,130,130,0.7);
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .dash-delete-one:hover { background: rgba(255,80,80,0.1); border-color: rgba(255,80,80,0.4); }
+    .dash-close {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--cream-dim);
+      padding: 14px 24px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: all 0.2s;
+    }
+    .dash-close:hover { border-color: var(--accent); color: var(--cream); }
+    .dash-count {
+      font-size: 13px;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    /* Admin button */
+    .admin-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(13,31,53,0.9);
+      border: 1px solid rgba(107,159,202,0.3);
+      color: var(--accent);
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      z-index: 50;
+      transition: all 0.2s;
+    }
+    .admin-btn:hover { background: rgba(74,127,168,0.15); }
+
+    @media (max-width: 480px) {
+      .card { padding: 28px 20px; border-radius: 24px; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- STEP 1 — Intro -->
+  <div class="step active" id="step-1">
+    <div class="progress-track" onclick="handleAdminClick()" style="cursor:default;" title=""><div class="progress-fill"></div></div>
+    <span class="tag">💙 Comunidade Boom 💙</span>
+    <h1>Raio-X Boom</h1>
+    <p>Quero entender melhor quem está aqui dentro, quais dificuldades vocês enfrentam no Instagram e o que realmente faria diferença na rotina de vocês.</p>
+    <p>Vou usar essas respostas para criar experiências, conteúdos e encontros cada vez mais direcionados pra realidade de vocês. 💙</p>
+    <p class="highlight">Leva pouquíssimos minutos pra responder.</p>
+    <button class="btn" onclick="nextStep()">Começar →</button>
+  </div>
+
+  <!-- STEP 2 — Nome -->
+  <div class="step" id="step-2">
+    <div class="progress-track"><div class="progress-fill"></div></div>
+    <div class="step-counter">1 de 10</div>
+    <h2>Qual é o seu <em>nome</em>?</h2>
+    <input type="text" id="nome" placeholder="Digite seu nome" />
+    <button class="btn" onclick="nextStep()">Continuar →</button>
+  </div>
+
+  <!-- STEP 3 — Profissão -->
+  <div class="step" id="step-3">
+    <div class="progress-track"><div class="progress-fill"></div></div>
+    <div class="step-counter">2 de 10</div>
+    <h2>Com o que você <em>trabalha</em> hoje?</h2>
+    <input type="text" id="profissao" placeholder="Ex: Psicóloga, Social Media, Nail Designer..." />
+    <button class="btn" onclick="nextStep()">Continuar →</button>
+  </div>
+
+  <!-- STEP 4 — Uso do Instagram -->
+  <div class="step" id="step-4">
+    <div class="progress-track"><div class="progress-fill"></div></div>
+    <div class="step-counter">3 de 10</div>
+    <h2>Hoje você usa o Instagram de forma:</h2>
+    <div class="options">
+      <div class="option" onclick="selectSingle(this)">Profissional</div>
+      <div class="option" onclick="selectSingle(this)">Pessoal</div>
+      <div class="option" onclick="selectSingle(this)">Os dois</div>
+      <div class="option" onclick="selectSingle(this)">Ainda estou começando</div>
+    </div>
+  </div>
+
+  <!-- STEP 5 — Momento -->
+  <div class="step" id="step-5">
+    <div class="progress-track"><div class="progress-fill"></div></div>
+    <div class="step-counter">4 de 10</div>
+    <h2>Qual opção mais descreve o seu <em>momento</em>?</h2>
+    <div class="options">
+      <div class="option" onclick="selectSingle(this)">Estou começando no Instagram</div>
+      <div class="option" onclick="selectSingle(this)">Já produzo conteúdo, mas sem constância</div>
+      <div class="option" onclick="selectSingle(this)">Tenho constância, mas sinto que não cresço</div>
+      <div class="option" onclick="selectSingle(this)">Tenho audiência, mas dificuldade em converter</div>
+      <div class="option" onclick="selectSingle(this)">Me sinto perdida estrategicamente</div>
+      <div class="option" onclick="selectSingle(this)">Não sei o que está travando meu perfil</div>
+    </div>
+  </div>
+
+  <!-- STEP 6 — Maior dificuldade -->
+  <div class="step" id="step-6">
+    <div class="progress-track"><div class="progress-fill"></div></div>
+    <div class="step-counter">5 de 10</div>
+    <h2>Qual é a sua <em>maior dificuldade</em> no Instagram hoje?</h2>
+    <textarea id="dificuldade" placeholder="Pode me contar sem filtro rs"></textarea>
+    <button class="btn" onclick="nextStep()">Continuar →</button>
+  </div>
+
+  <!-- STEP 7 — Frustrações -->
+  <div class="step" id="step-7">
+    <div class="progress-track"><div class="progress-fill"></div></div>
+    <div class="step-counter">6 de 10</div>
+    <h2>O que mais te <em>frustra</em> quando o assunto é conteúdo?</h2>
+    <p class="helper">Pode escolher mais de uma opção 💙</p>
+    <div class="options" id="frustrações">
+      <label class="option"><input type="checkbox" value="Não saber o que postar" /> Não saber o que postar</label>
+      <label class="option"><input type="checkbox" value="Falta de constância" /> Falta de constância</label>
+      <label class="option"><input type="checkbox" value="Baixo engajamento" /> Baixo engajamento</label>
+      <label class="option"><input type="checkbox" value="Conteúdo não transmite autoridade" /> Meu conteúdo não transmite autoridade</label>
+      <label class="option"><input type="checkbox" value="Não consigo atrair clientes" /> Não consigo atrair clientes</label>
+      <label class="option"><input type="checkbox" value="Comparação e insegurança" /> Comparação e insegurança</label>
+      <label class="option"><input type="checkbox" value="Não converto seguidores em vendas" /> Não consigo transformar seguidores em vendas</label>
+    </div>
+    <button class="btn" onclick="nextStep()">Continuar →</button>
+  </div>
+
+  <!-- STEP 8 — Perfil transmite valor? -->
+  <div class="step" id="step-8">
+    <div class="progress-track"><div class="progress-fill"></div></div>
+    <div class="step-counter">7 de 10</div>
+    <h2>Você sente que seu perfil transmite o <em>valor do seu trabalho</em>?</h2>
+    <div class="options">
+      <div class="option" onclick="selectSingle(this)">Sim</div>
+      <div class="option" onclick="selectSingle(this)">Mais ou menos</div>
+      <div class="option" onclick="selectSingle(this)">Não</div>
+      <div class="option" onclick="selectSingle(this)">Nunca parei pra pensar nisso</div>
+    </div>
+  </div>
+
+  <!-- STEP 9 — O que quer conquistar -->
+  <div class="step" id="step-9">
+    <div class="progress-track"><div class="progress-fill"></div></div>
+    <div class="step-counter">8 de 10</div>
+    <h2>O que você mais quer <em>conquistar</em> no Instagram hoje?</h2>
+    <p class="helper">Pode escolher mais de uma opção 💙</p>
+    <div class="options" id="conquistas">
+      <label class="option"><input type="checkbox" value="Mais autoridade" /> Mais autoridade</label>
+      <label class="option"><input type="checkbox" value="Mais clientes" /> Mais clientes</label>
+      <label class="option"><input type="checkbox" value="Saber o que postar" /> Saber o que postar</label>
+      <label class="option"><input type="checkbox" value="Crescimento" /> Crescimento</label>
+      <label class="option"><input type="checkbox" value="Posicionamento" /> Posicionamento</label>
+      <label class="option"><input type="checkbox" value="Organização" /> Organização</label>
+      <label class="option"><input type="checkbox" value="Confiança pra aparecer" /> Confiança pra aparecer</label>
+      <label class="option"><input type="checkbox" value="Ter uma estratégia" /> Ter uma estratégia</label>
+    </div>
+    <button class="btn" onclick="nextStep()">Continuar →</button>
+  </div>
+
+  <!-- STEP 10 — Uma coisa -->
+  <div class="step" id="step-10">
+    <div class="progress-track"><div class="progress-fill"></div></div>
+    <div class="step-counter">9 de 10</div>
+    <h2>Se eu pudesse te ajudar em <em>uma única coisa</em> hoje no Instagram, o que você pediria?</h2>
+    <textarea id="umacoisa" placeholder="Essa resposta vale ouro 👀"></textarea>
+    <button class="btn" onclick="nextStep()">Continuar →</button>
+  </div>
+
+  <!-- STEP 11 — Experiências na comunidade -->
+  <div class="step" id="step-11">
+    <div class="progress-track"><div class="progress-fill"></div></div>
+    <div class="step-counter">10 de 10</div>
+    <h2>Que experiências você gostaria de ter na <em>Comunidade Boom</em>?</h2>
+    <p class="helper">Pode escolher mais de uma opção 💙</p>
+    <div class="options" id="experiencias">
+      <label class="option"><input type="checkbox" value="Workshops e imersões ao vivo pagas" /> Workshops e imersões ao vivo pagas</label>
+      <label class="option"><input type="checkbox" value="Aulas gratuitas ao vivo" /> Aulas gratuitas ao vivo</label>
+      <label class="option"><input type="checkbox" value="Diagnósticos de perfil" /> Diagnósticos de perfil</label>
+      <label class="option"><input type="checkbox" value="Encontros menores por dificuldade" /> Encontros menores por dificuldade</label>
+      <label class="option"><input type="checkbox" value="Rodadas de tira-dúvidas" /> Rodadas de tira-dúvidas</label>
+      <label class="option"><input type="checkbox" value="Bastidores estratégicos" /> Bastidores estratégicos</label>
+      <label class="option"><input type="checkbox" value="Desafios" /> Desafios</label>
+    </div>
+    <button class="btn" onclick="nextStep()">Continuar →</button>
+  </div>
+
+  <!-- STEP 12 — Contato -->
+  <div class="step" id="step-12">
+    <div class="progress-track"><div class="progress-fill"></div></div>
+    <h2>Posso entrar em contato caso eu veja que consigo te <em>ajudar especificamente</em> no seu caso?</h2>
+    <div class="options">
+      <div class="option" onclick="selectSingle(this)">Sim</div>
+      <div class="option" onclick="selectSingle(this)">Não</div>
+    </div>
+  </div>
+
+  <!-- DIAGNÓSTICO -->
+  <div class="step" id="step-diag">
+    <div class="progress-track"><div class="progress-fill"></div></div>
+    <span class="tag">💙 Resultado 💙</span>
+    <h2>Seu diagnóstico <em>estratégico</em> 💙</h2>
+    <div id="diag-content" style="background:rgba(107,159,202,0.07); border:1px solid rgba(107,159,202,0.2); border-radius:20px; padding:24px 22px; margin-bottom:24px;">
+      <p id="diag-text" style="color:var(--cream); font-size:16px; line-height:1.8; margin:0;"></p>
+    </div>
+    <p style="font-size:13px; color:rgba(251,249,242,0.35); margin-bottom:4px;">Este é um diagnóstico inicial baseado nas suas respostas. Quer aprofundar? A Sessão Boom foi feita pra isso. 😊</p>
+    <button class="btn" onclick="nextStep()">Ver mensagem final →</button>
+  </div>
+
+  <!-- FINAL -->
+  <div class="step" id="step-final">
+    <div class="progress-track"><div class="progress-fill"></div></div>
+    <h2>Perfeito, <em>obrigada(o)!</em></h2>
+    <p>Obrigada(o) por responder o Raio-X Boom.</p>
+    <p>Vou analisar tudo com calma porque quero usar essas respostas pra criar experiências MUITO mais direcionadas e úteis dentro da comunidade.</p>
+    <p style="color:var(--accent); font-size:14px; margin-top:4px;">Obrigada(o) por fazer parte da comunidade 💙</p>
+    <button class="btn" id="btn-enviar" style="margin-top:24px" onclick="submitForm()">Enviar</button>
+    <div id="enviado-msg" style="display:none; margin-top:20px; text-align:center; animation: stepIn 0.4s ease both;">
+      <div style="font-size:40px; margin-bottom:12px;">💙</div>
+      <p style="color:var(--accent); font-size:18px; font-weight:600; margin-bottom:6px;">Enviado com sucesso!</p>
+      <p style="font-size:14px; color:rgba(251,249,242,0.5);">Suas respostas foram registradas. Até breve!</p>
+    </div>
+  </div>
+
+</div>
+
+
+
+<!-- Dashboard -->
+<div id="dashboard">
+  <div class="dash-card">
+    <div class="dash-title">Painel Raio-X Boom</div>
+    <div class="dash-sub">Resumo de todas as respostas recebidas</div>
+    <div class="dash-count" id="dash-count"></div>
+    <div id="dash-entries"></div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:20px;">
+      <button class="dash-close" onclick="closeDashboard()">← Fechar painel</button>
+      <button class="dash-delete-all" onclick="deleteAllEntries()">🗑 Apagar todas as respostas</button>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden Formspree form -->
+<form id="formspree-form" action="https://formspree.io/f/mwvzwwyk" method="POST" style="display:none">
+  <input type="hidden" name="nome" id="fs-nome" />
+  <input type="hidden" name="profissao" id="fs-profissao" />
+  <input type="hidden" name="uso_instagram" id="fs-uso" />
+  <input type="hidden" name="momento" id="fs-momento" />
+  <input type="hidden" name="maior_dificuldade" id="fs-dificuldade" />
+  <input type="hidden" name="frustracoes" id="fs-frustracoes" />
+  <input type="hidden" name="perfil_transmite_valor" id="fs-valor" />
+  <input type="hidden" name="quer_conquistar" id="fs-conquistas" />
+  <input type="hidden" name="uma_coisa" id="fs-umacoisa" />
+  <input type="hidden" name="experiencias_comunidade" id="fs-experiencias" />
+  <input type="hidden" name="aceita_contato" id="fs-contato" />
+  <button type="submit" id="fs-submit"></button>
+</form>
+
+<script>
+  const steps = document.querySelectorAll('.step');
+  let current = 0;
+  const total = steps.length;
+
+  // Store answers
+  const answers = {
+    uso: '', momento: '', valor: '', contato: ''
+  };
+
+  function updateProgress() {
+    const pct = ((current + 1) / total) * 100;
+    document.querySelectorAll('.progress-fill').forEach(el => {
+      el.style.width = pct + '%';
+    });
+  }
+
+  function selectSingle(el) {
+    // Store value based on current step
+    const stepId = steps[current].id;
+    if (stepId === 'step-4') answers.uso = el.textContent.trim();
+    if (stepId === 'step-5') answers.momento = el.textContent.trim();
+    if (stepId === 'step-8') answers.valor = el.textContent.trim();
+    if (stepId === 'step-12') answers.contato = el.textContent.trim();
+    nextStep();
+  }
+
+  function nextStep() {
+    const activeStep = steps[current];
+    const input = activeStep.querySelector('input[type="text"], textarea');
+    if (input && !input.value.trim()) {
+      input.style.borderColor = 'rgba(255,120,120,0.6)';
+      input.focus();
+      setTimeout(() => input.style.borderColor = '', 1500);
+      return;
+    }
+
+    steps[current].classList.remove('active');
+    current = Math.min(current + 1, total - 1);
+    steps[current].classList.add('active');
+    updateProgress();
+
+    // Generate diagnosis when arriving at diag step
+    if (steps[current].id === 'step-diag') {
+      generateDiagnosis();
+    }
+
+    document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function getChecked(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return '';
+    return Array.from(container.querySelectorAll('input[type="checkbox"]:checked'))
+      .map(cb => cb.value).join(', ');
+  }
+
+  function submitForm() {
+    const nome = document.getElementById('nome').value.trim();
+    const profissao = document.getElementById('profissao').value.trim();
+    const dificuldade = document.getElementById('dificuldade').value.trim();
+    const umacoisa = document.getElementById('umacoisa').value.trim();
+    const frustracoes = getChecked('frustrações');
+    const conquistas = getChecked('conquistas');
+    const experiencias = getChecked('experiencias');
+
+    // Fill hidden form
+    document.getElementById('fs-nome').value = nome;
+    document.getElementById('fs-profissao').value = profissao;
+    document.getElementById('fs-uso').value = answers.uso;
+    document.getElementById('fs-momento').value = answers.momento;
+    document.getElementById('fs-dificuldade').value = dificuldade;
+    document.getElementById('fs-frustracoes').value = frustracoes;
+    document.getElementById('fs-valor').value = answers.valor;
+    document.getElementById('fs-conquistas').value = conquistas;
+    document.getElementById('fs-umacoisa').value = umacoisa;
+    document.getElementById('fs-experiencias').value = experiencias;
+    document.getElementById('fs-contato').value = answers.contato;
+
+    // Save to localStorage for dashboard
+    const entry = { nome, profissao, uso: answers.uso, momento: answers.momento, dificuldade, frustracoes, valor: answers.valor, conquistas, umacoisa, experiencias, contato: answers.contato, data: new Date().toLocaleDateString('pt-BR') };
+    const saved = JSON.parse(localStorage.getItem('raiox_respostas') || '[]');
+    saved.push(entry);
+    localStorage.setItem('raiox_respostas', JSON.stringify(saved));
+
+    // Save to localStorage for dashboard
+    // Submit formspree via fetch to avoid page redirect
+    const formData = new FormData(document.getElementById('formspree-form'));
+    fetch('https://formspree.io/f/mwvzwwyk', {
+      method: 'POST',
+      body: formData,
+      headers: { 'Accept': 'application/json' }
+    }).then(() => {
+      document.getElementById('btn-enviar').style.display = 'none';
+      document.getElementById('enviado-msg').style.display = 'block';
+    }).catch(() => {
+      document.getElementById('btn-enviar').style.display = 'none';
+      document.getElementById('enviado-msg').style.display = 'block';
+    });
+  }
+
+  function openDashboard() {
+    const saved = JSON.parse(localStorage.getItem('raiox_respostas') || '[]');
+    const container = document.getElementById('dash-entries');
+    const count = document.getElementById('dash-count');
+
+    count.textContent = saved.length === 0 ? 'Nenhuma resposta ainda.' : `${saved.length} resposta(s) registrada(s)`;
+
+    if (saved.length === 0) {
+      container.innerHTML = '<div class="dash-empty">Ainda não há respostas registradas.</div>';
+    } else {
+      container.innerHTML = saved.map((e, i) => `
+        <div class="dash-entry">
+          <div class="dash-entry-header">
+            <span class="dash-name">${e.nome || '—'}</span>
+            <span class="dash-prof">${e.profissao || '—'}</span>
+            <button class="dash-delete-one" onclick="deleteEntry(${i})">🗑</button>
+          </div>
+          <div class="dash-row">📅 Data: <span>${e.data}</span></div>
+          <div class="dash-row">📱 Uso do Instagram: <span>${e.uso || '—'}</span></div>
+          <div class="dash-row">📍 Momento: <span>${e.momento || '—'}</span></div>
+          <div class="dash-row">😤 Maior dificuldade: <span>${e.dificuldade || '—'}</span></div>
+          <div class="dash-row">😣 Frustrações: <span>${e.frustracoes || '—'}</span></div>
+          <div class="dash-row">✨ Perfil transmite valor: <span>${e.valor || '—'}</span></div>
+          <div class="dash-row">🎯 Quer conquistar: <span>${e.conquistas || '—'}</span></div>
+          <div class="dash-row">💡 Uma coisa: <span>${e.umacoisa || '—'}</span></div>
+          <div class="dash-row">🌟 Experiências desejadas: <span>${e.experiencias || '—'}</span></div>
+          <div class="dash-row">📞 Aceita contato: <span>${e.contato || '—'}</span></div>
+        </div>
+      `).join('');
+    }
+
+    document.getElementById('dashboard').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDashboard() {
+    document.getElementById('dashboard').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  updateProgress();
+
+  function generateDiagnosis() {
+    const nome = document.getElementById('nome').value.trim().split(' ')[0] || 'você';
+    const frustracoes = getChecked('frustrações');
+    const conquistas = getChecked('conquistas');
+    const momento = answers.momento || '';
+    const valor = answers.valor || '';
+
+    const has = (str, ...terms) => terms.some(t => str.toLowerCase().includes(t.toLowerCase()));
+
+    let msg = '';
+
+    // 1. Insegurança + autoridade → problema de percepção/posicionamento
+    if (has(frustracoes, 'insegurança') && has(frustracoes, 'autoridade')) {
+      msg = `${nome}, o que as suas respostas revelam é que o problema provavelmente não é o que você posta, é como você está sendo percebida por quem chega. Isso é mais sobre posicionamento e identidade do que volume de conteúdo, e quando a mensagem fica clara, a autoridade aparece naturalmente.`;
+
+    // 2. Não saber o que postar + falta de constância → falta de direção estratégica
+    } else if (has(frustracoes, 'não saber o que postar') && has(frustracoes, 'constância')) {
+      msg = `${nome}, essa combinação quase sempre aponta para a mesma raiz, que é a ausência de uma direção clara. Não é bloqueio criativo, é falta de estratégia mesmo, e quando você sabe exatamente com quem fala e o que quer comunicar, o conteúdo para de ser um esforço e começa a fluir.`;
+
+    // 3. Constância + dificuldade em converter → presença sem resultado
+    } else if (has(frustracoes, 'seguidores em vendas') && has(momento, 'constância')) {
+      msg = `${nome}, você já entende a importância de estar presente, e isso é um passo à frente de muita gente. O que ainda trava é transformar essa presença em resultado real, porque constância sem conversão é esforço sem retorno, e esse é o ponto que precisa de atenção agora.`;
+
+    // 4. Engajamento baixo + perfil não transmite valor → mensagem não está chegando
+    } else if (has(frustracoes, 'engajamento') && has(valor, 'não', 'mais ou menos')) {
+      msg = `${nome}, engajamento baixo e a sensação de que o perfil não comunica o valor do seu trabalho quase sempre caminham juntos. Quando o perfil não deixa claro quem você é e o que entrega, as pessoas passam sem reagir, não por falta de interesse, mas porque a mensagem ainda não chegou com força suficiente.`;
+
+    // 5. Começando → momento de fundação
+    } else if (has(momento, 'começando')) {
+      msg = `${nome}, você está num momento que define tudo, que é o começo. E começar fazendo as perguntas certas já coloca você à frente. O que mais vai importar agora não é quantidade de conteúdo, é entender com clareza quem você quer atrair e o que quer que essa pessoa sinta quando chega no seu perfil.`;
+
+    // 6. Quer clientes + não converte seguidores → atenção sem conexão
+    } else if (has(conquistas, 'clientes') && has(frustracoes, 'seguidores em vendas')) {
+      msg = `${nome}, suas respostas mostram um perfil que já atrai atenção, mas ainda encontra dificuldade em transformar essa atenção em interesse real. A distância entre seguidor e cliente quase sempre está na forma como a oferta é apresentada, e isso tem solução mais simples do que parece.`;
+
+    // 7. Dificuldade de aparecer + insegurança → bloqueio de presença
+    } else if (has(conquistas, 'aparecer') || has(frustracoes, 'insegurança')) {
+      msg = `${nome}, a dificuldade de aparecer raramente tem a ver com falta de conteúdo. Quase sempre está ligada a não saber ao certo o que dizer, para quem dizer e por que a sua voz importa, e quando essas três coisas se alinham, aparecer deixa de ser um esforço e vira algo natural.`;
+
+    // 8. Perdida estrategicamente + não sabe o que trava → desorientação geral
+    } else if (has(momento, 'perdida') || has(momento, 'travando')) {
+      msg = `${nome}, a sensação de estar perdida estrategicamente é mais comum do que parece, e quase sempre significa que falta um fio condutor. Não é sobre fazer mais, é sobre entender o que você já faz e reorganizar com intenção, porque uma direção clara muda tudo.`;
+
+    // 9. Fallback — sempre personalizado, nunca genérico
+    } else {
+      msg = `${nome}, suas respostas mostram alguém que já compreende o potencial do Instagram mas ainda sente que falta uma peça para tudo se encaixar. Esse é um ponto muito específico, e quase sempre está em algo que, de dentro, é difícil de enxergar sozinha.`;
+    }
+
+    document.getElementById('diag-text').textContent = msg;
+  }
+
+  function deleteEntry(index) {
+    if (!confirm('Apagar essa resposta?')) return;
+    const saved = JSON.parse(localStorage.getItem('raiox_respostas') || '[]');
+    saved.splice(index, 1);
+    localStorage.setItem('raiox_respostas', JSON.stringify(saved));
+    openDashboard();
+  }
+
+  function deleteAllEntries() {
+    if (!confirm('Apagar TODAS as respostas? Isso não pode ser desfeito.')) return;
+    localStorage.removeItem('raiox_respostas');
+    openDashboard();
+  }
+
+  // Admin hidden trigger - single click on progress bar
+  function handleAdminClick() {
+    const pwd = prompt('Senha:');
+    if (pwd === 'tirza1998.28') {
+      openDashboard();
+    }
+  }
+</script>
+
+</body>
+</html>
